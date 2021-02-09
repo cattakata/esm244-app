@@ -2,6 +2,7 @@ library(tidyverse)
 library(shiny)
 library(here)
 library(shinythemes)
+library(leaflet)
 
 foraging <- read.csv(here("data","2018_foraging.csv"))
 
