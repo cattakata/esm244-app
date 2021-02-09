@@ -9,7 +9,17 @@ ui <- fluidPage(
     theme = shinytheme("cerulean"),
                 
                 navbarPage("Sea otter foraging",
-                           tabPanel("Thing 1",
+                           tabPanel("About this site",
+                                    tags$div(
+                                      tags$br(), tags$br(), tags$h4("Background"),
+                                      "The sea otters of Prince Wales, Alaska, U.S., were relocated as a result of conservation efforts in 1968.                                             Ecologist of the University of Alaska and neighboring areas studied these otters as a part of the Apex Predators,                                        Ecosystems, and Community Sustainability (APECS) project in order to study the impacts of the reintroduction on                                          coastal communities. We will further manipulate the data provided to create an interactive interface to identify                                         trends or significant effects.", 
+                                      tags$br(),tags$br(),tags$h4("Code"),
+                                      "Code and input data used to generate this Shiny mapping tool are available as ",tags$a(href="https://knb.ecoinformatics.org/view/urn%3Auuid%3Abbf026b7-ca66-412e-9243-33532506c4e0", "Sea otter foraging data."),
+                                      tags$br(),tags$br(),tags$h4("Sources"),
+                                      "Nicole LaRoche, Sydney King, and Heidi Pearson. 2020. Sea otter foraging data, visual observations from Prince of Wales, Alaska. Knowledge Network for Biocomplexity. urn:uuid:bbf026b7-ca66-412e-9243-33532506c4e0.",
+                                    )
+                                    ),
+                           tabPanel("Dive Type",
                                     sidebarLayout(
                                         sidebarPanel(selectInput("select", label = h3("Select dive type:"), 
                                                                  choices = list(
@@ -25,7 +35,7 @@ ui <- fluidPage(
                                         mainPanel("map coming soon")
                                     )
                                     ),
-                           tabPanel("Thing 2",
+                           tabPanel("Prey Type",
                                     sidebarLayout(
                                         sidebarPanel(checkboxGroupInput("checkGroup", label = h3("Prey type"), 
                                                                         choices = list(
@@ -38,7 +48,7 @@ ui <- fluidPage(
                                         mainPanel("Histogram of counts of selected prey obtained")
                                     )
                                     ),
-                           tabPanel("Thing 3",
+                           tabPanel("Cloud Cover",
                                     sidebarLayout(
                                         sidebarPanel(
                                             fluidRow(
@@ -61,7 +71,7 @@ ui <- fluidPage(
                                         mainPanel("Linear regression describing how successful a dive is, predicted by cloud cover")
                                     )
                                     ),
-                           tabPanel("Thing 4",
+                           tabPanel("Otter Age and Sex",
                                     sidebarLayout(
                                         sidebarPanel(checkboxGroupInput("checkGroup", label = h3("Select age and sex"), 
                                                                         choices = list(
