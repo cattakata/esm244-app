@@ -59,7 +59,7 @@ ui <- fluidPage(
                                     sidebarLayout(
                                         sidebarPanel(
                                             fluidRow(
-                                                column(4,
+                                                column(12,
                                                        sliderInput("slider2", label = h3("Slider Range"), min = 0, 
                                                                    max = 100, value = c(40, 60))
                                                 )
@@ -68,8 +68,8 @@ ui <- fluidPage(
                                             hr(),
                                             
                                             fluidRow(
-                                                column(4, verbatimTextOutput("value")),
-                                                column(4, verbatimTextOutput("range"))
+                                                column(12, verbatimTextOutput("value")),
+                                                column(12, verbatimTextOutput("range"))
                                             )
                                             
                                             
