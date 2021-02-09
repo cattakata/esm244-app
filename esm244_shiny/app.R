@@ -10,13 +10,19 @@ ui <- fluidPage(
                 
                 navbarPage("Sea otter foraging",
                            tabPanel("About this site",
+                                    leaflet() %>% 
+                                      addTiles() %>% 
+                                      addMarkers(lng = -134.105784, lat = 56.336226, popup = "Prince of Wales, AK"),
                                     tags$div(
                                       tags$br(), tags$br(), tags$h4("Background"),
                                       "The sea otters of Prince Wales, Alaska, U.S., were relocated as a result of conservation efforts in 1968.                                             Ecologist of the University of Alaska and neighboring areas studied these otters as a part of the Apex Predators,                                        Ecosystems, and Community Sustainability (APECS) project in order to study the impacts of the reintroduction on                                          coastal communities. We will further manipulate the data provided to create an interactive interface to identify                                         trends or significant effects.", 
                                       tags$br(),tags$br(),tags$h4("Code"),
-                                      "Code and input data used to generate this Shiny mapping tool are available as ",tags$a(href="https://knb.ecoinformatics.org/view/urn%3Auuid%3Abbf026b7-ca66-412e-9243-33532506c4e0", "Sea otter foraging data."),
+                                      "Code and input data used to generate this Shiny mapping tool are available as ",tags$a(href="https://knb       .ecoinformatics.org/view/urn%3Auuid%3Abbf026b7-ca66-412e-9243-33532506c4e0", "sea otter foraging data."),
                                       tags$br(),tags$br(),tags$h4("Sources"),
                                       "Nicole LaRoche, Sydney King, and Heidi Pearson. 2020. Sea otter foraging data, visual observations from Prince of Wales, Alaska. Knowledge Network for Biocomplexity. urn:uuid:bbf026b7-ca66-412e-9243-33532506c4e0.",
+                                      tags$br(),tags$br(),tags$h4("Authors"),
+                                      "Lory Salazar, Master's Candidate at The Bren School of Environmental Science & Management",tags$br(),
+                                      "Catherine Takata, Master's Candidate at The Bren School of Environmental Science & Management ",tags$br(),
                                     )
                                     ),
                            tabPanel("Dive Type",
