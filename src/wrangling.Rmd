@@ -10,15 +10,16 @@ knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 library(tidyverse)
 library(here)
 library(janitor)
+library(lubridate)
 ```
 
 ```{r}
-# reading in data
+# reading in data + some cleaning up
 otters <- read.csv(here("data", "2018_Foraging.csv")) %>% 
-  clean_names()
+  clean_names() %>% 
+  mutate(date = mdy(date)) %>% 
+  rename(aerial_survey_yr = year) # i know you probably hate this name LOL but i only renamed it because this is a DIFFERENT THING than the date; i was getting confused as to why the date and year columns had diff years listed so i just want to make that clear
 ```
 
-```{r}
 
-```
 
