@@ -1,0 +1,24 @@
+---
+title: "otters wrangling"
+author: "lor + cat"
+date: "2/18/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+library(tidyverse)
+library(here)
+library(janitor)
+```
+
+```{r}
+# reading in data
+otters <- read.csv(here("data", "2018_Foraging.csv")) %>% 
+  clean_names()
+```
+
+```{r}
+
+```
+

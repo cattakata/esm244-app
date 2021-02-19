@@ -4,7 +4,7 @@ library(here)
 library(shinythemes)
 library(leaflet)
 
-foraging <- read.csv(here("data","2018_foraging.csv"))
+foraging <- read.csv(here("data","2018_foraging.csv")) # i don't think we need this in our code at this point???? since we're not using any data yet? scared 2 delete it but i don't think we need it, when we make graphs n stuff later we'll probably call to subsets of the data anyway idk
 
 ui <- fluidPage(
     theme = shinytheme("cerulean"),
