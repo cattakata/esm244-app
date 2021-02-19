@@ -21,5 +21,54 @@ otters <- read.csv(here("data", "2018_Foraging.csv")) %>%
   rename(aerial_survey_yr = year) # i know you probably hate this name LOL but i only renamed it because this is a DIFFERENT THING than the date; i was getting confused as to why the date and year columns had diff years listed so i just want to make that clear
 ```
 
+```{r}
+# WIDGET 2 STUFF
+
+# to create a histogram of counts of prey obtained we would just need the prey item, success of dive (which indicates if dive is brought to surface or not), and prey quantity to determine the number of prey successfully caught 
+prey <- otters %>% 
+  select(suc, prey_item, date, age, prey_qty) %>% 
+  group_by(prey_item) %>% 
+  count(suc, wt = prey_qty) %>% 
+  rename(prey_caught = n) %>% 
+  filter(suc == "Y")
+
+# example plot with all a couple prey shown: widget selection would be CLA, SAG, UNK
+top_prey <- prey %>% 
+  filter(prey_item == "CLA" |
+           prey_item == "SAG" |
+           prey_item == "UNK")
+
+ggplot(data = top_prey, aes(x = prey_item, y = prey_caught)) +
+  geom_col()
+
+
+# creating a new subset to filter by one prey type, just to see what they would look like if we went for a col graph for sex, using clams as an example 
+clams_sex <- otters %>% 
+  select(suc, prey_item, date, age, prey_qty, sex) %>% 
+  group_by(prey_item, sex) %>% 
+  count(suc, wt = prey_qty) %>% 
+  rename(prey_caught = n) %>% 
+  filter(prey_item == "CLA", suc == "Y")
+  
+ggplot(data = clams_sex, aes(x = sex, y = prey_caught)) +
+  geom_col()
+
+# doing the same example but with age just out of curiosity? if we're trying to see if adults have more foraging success than juveniles and if that changes based on prey type
+clams_age <- otters %>% 
+  select(suc, prey_item, date, age, prey_qty, age) %>% 
+  group_by(prey_item, age) %>% 
+  count(suc, wt = prey_qty) %>% 
+  rename(prey_caught = n) %>% 
+  filter(prey_item == "CLA", suc == "Y")
+  
+ggplot(data = clams_age, aes(x = age, y = prey_caught)) +
+  geom_col()
+
+# soooo some options here: widget: select prey type | output: column graph depicting the counts of prey successfully caught for the type chosen, by either sex or age. if multiple prey types were selected, then we could make it a grouped or stacked plot and color code by species type, include legend. OR ignore all that, the x-axis can just be the species name and sex and age aren't included? i'm good with either, idk i just needed to see all three plots to understand what i was looking at
+
+# pls note that i also know we would code this differently in the app script to make it reactive!! i just needed to roughly look at example plots
+
+
+```
 
 
