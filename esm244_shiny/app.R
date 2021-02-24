@@ -3,8 +3,20 @@ library(shiny)
 library(here)
 library(shinythemes)
 library(leaflet)
+library(janitor)
+library(lubridate)
 
-foraging <- read.csv(here("data","2018_foraging.csv")) # i don't think we need this in our code at this point???? since we're not using any data yet? scared 2 delete it but i don't think we need it, when we make graphs n stuff later we'll probably call to subsets of the data anyway idk
+foraging <- read.csv(here("data","2018_foraging.csv")) %>% 
+  clean_names() %>% 
+  mutate(date = mdy(date)) %>% 
+  rename(aerial_survey_yr = year)
+
+prey <- foraging %>% 
+  select(suc, prey_item, date, age, prey_qty) %>% 
+  group_by(prey_item) %>% 
+  count(suc, wt = prey_qty) %>% 
+  rename(prey_caught = n) %>% 
+  filter(suc == "Y")
 
 ui <- fluidPage(
     theme = shinytheme("cerulean"),
@@ -42,19 +54,7 @@ ui <- fluidPage(
                                         mainPanel("map coming soon")
                                     )
                                     ),
-                           tabPanel("Prey Type",
-                                    sidebarLayout(
-                                        sidebarPanel(checkboxGroupInput("checkGroup", label = h3("Prey type"), 
-                                                                        choices = list(
-                                                                            "Sea cucumber" = 1, "Graceful crab" = 2, "Sea peach" = 3),
-                                                                        selected = 1),
-                                                     
-                                                     
-                                                     hr(),
-                                                     fluidRow(column(3, verbatimTextOutput("value")))),
-                                        mainPanel("Histogram of counts of selected prey obtained")
-                                    )
-                                    ),
+                           
                            tabPanel("Cloud Cover",
                                     sidebarLayout(
                                         sidebarPanel(
@@ -92,7 +92,19 @@ ui <- fluidPage(
                                                      ),
                                         mainPanel("Summary statistics for age and sex selected")
                                     )
+                                    ),
+                           
+                           tabPanel("Prey",
+                                    sidebarLayout(
+                                      sidebarPanel(
+                                                   checkboxGroupInput(inputId = "pick_prey",
+                                                                      label = "Choose species:",
+                                                                      choices = unique(prey$prey_item))
+                                      ),
+                                      mainPanel("plot of prey successfully obtained",
+                                                plotOutput("prey_plot"))
                                     )
+                           )
                            
                            
                 )
@@ -100,6 +112,21 @@ ui <- fluidPage(
                 
 )
 
-server <- function(input, output) {}
+server <- function(input, output) {
+  
+  prey_reactive <- reactive({
+    
+    prey %>%
+      filter(prey_item %in% input$pick_prey)
+  })
+  
+  output$prey_plot <- renderPlot({
+    ggplot(data = prey_reactive(), aes(x = prey_item,
+                                       y = prey_caught)) +
+      geom_col()
+    
+  })
+  
+}
 
 shinyApp(ui = ui, server = server)
