@@ -12,6 +12,7 @@ library(here)
 library(janitor)
 library(lubridate)
 library(kableExtra)
+library(broom)
 ```
 
 ```{r}
@@ -60,6 +61,58 @@ otter_stats %>%
   kable_styling(bootstrap_options = "striped", full_width = FALSE)
   
 ```
+
+```{r}
+# Messing with regression
+otters_suc <- otters %>% 
+  filter(age == "J" | age == "A") %>% 
+  filter(suc %in% c("Y", "N")) %>% 
+  mutate(suc = fct_drop(suc))
+
+levels(otters_suc$suc) # [1] "N" "Y"
+
+otters_blr <- glm(suc ~ dt + rain + age, 
+                            data = otters_suc, 
+                            family = "binomial")
+
+otters_blr
+summary(otters_blr)
+
+blr_fitted <- otters_blr %>% 
+  broom::augment(type.predict = "response")
+```
+
+```{r}
+ggplot(data = blr_fitted, aes(x = dt, y = .fitted)) +
+  geom_point(aes(color = age)) +
+  geom_smooth(aes(color = age), se = FALSE) +
+  labs(x = "dive time",
+       y = "Probability of a successful dive")
+```
+
+```{r}
+otters_lm <- lm(prey_qty ~ dt, data = otters)
+
+summary(otters)
+
+# Below, I use broom to tidy the table we got from the linear model.
+
+otters_lm_tidy <- broom::tidy(otters_lm)
+
+# plot
+ggplot(data = otters, aes(x = prey_qty, y = dt)) +
+  geom_jitter(size = 2) +
+  geom_smooth(method = "lm",
+              color = "red",
+              size = 0.5,
+              fill = "gray10",
+              alpha = 0.5) + # geom_smooth is to add a linear model to a scatterplot
+  labs(x = "Prey quantity", y = "Dive time (seconds)") +
+  theme_light() +
+    ggpubr::stat_regline_equation(label.x = 17, label.y = 300)
+```
+
+
 
 
 
