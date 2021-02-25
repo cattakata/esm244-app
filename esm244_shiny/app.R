@@ -120,12 +120,12 @@ server <- function(input, output) {
       filter(prey_item %in% input$pick_prey)
   })
   
-  output$prey_plot <- renderPlot({
+  output$prey_plot <- renderPlot(
     ggplot(data = prey_reactive(), aes(x = prey_item,
                                        y = prey_caught)) +
       geom_col()
     
-  })
+  )
   
 }
 
