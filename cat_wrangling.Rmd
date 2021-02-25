@@ -23,9 +23,22 @@ foraging <- read.csv(here("data","2018_foraging.csv")) %>%
 ```
 
 ```{r}
-dive_locations <- st_as_sf(x = foraging, 
-                        coords = c("otter_long_deg", "otter_lat_deg"),
-                        crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0")
-mapview(dive_locations)
+#dive_locations <- st_as_sf(x = foraging, 
+                        #coords = c("otter_long_deg", "otter_lat_deg"),
+                        #crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0")
+#mapview(dive_locations)
+```
+
+```{r}
+alaska <- ne_download(scale = 110, type = "states", category = "cultural", returnclass = "sf") %>%
+  filter(name == "Alaska")
+```
+
+
+```{r}
+tmap_mode(mode = "view")
+
+tm_shape(alaska) +
+  tm_shape(dive_locations)
 ```
 
