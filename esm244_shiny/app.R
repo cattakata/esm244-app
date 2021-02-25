@@ -18,6 +18,8 @@ prey <- foraging %>%
   rename(prey_caught = n) %>% 
   filter(suc == "Y")
 
+
+
 ui <- fluidPage(
     theme = shinytheme("cerulean"),
                 
