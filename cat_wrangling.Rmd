@@ -1,0 +1,46 @@
+---
+title: "cat wrangling"
+author: "Catherine Takata"
+date: "2/24/2021"
+output: html_document
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(rnaturalearth)
+library(sf)
+library(janitor)
+library(tmap)
+```
+
+```{r summary stats, echo = F}
+dive_data <- read.csv(here("data","2018_foraging.csv")) %>% 
+  clean_names() %>% 
+  select(otter_lat_deg, otter_long_deg, suc)
+```
+
+```{r}
+dive_locations <- st_as_sf(x = dive_data, 
+                        coords = c("otter_long_deg", "otter_lat_deg"),
+                        crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0")
+#mapview(dive_locations)
+```
+
+```{r}
+alaska <- read_sf(here("data", "alaska_shape", "tl_2017_02_place.shp")) %>% 
+  select(NAME, ALAND) %>% 
+  rename(county_name = NAME, land_area = ALAND)
+```
+
+
+```{r}
+tmap_mode(mode = "view")
+
+tm_shape(alaska) +
+  tm_fill("land_area") +
+  tm_shape(dive_locations) + 
+  tm_dots()
+```
+

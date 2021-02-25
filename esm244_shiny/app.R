@@ -18,10 +18,22 @@ prey <- foraging %>%
   rename(prey_caught = n) %>% 
   filter(suc == "Y")
 
-
 age_sex <- foraging %>% 
   filter(sex == "F" | sex == "M") %>% 
   filter(age == "J" | age == "A")
+
+dive_data <- foraging %>% 
+  select(otter_lat_deg, otter_long_deg, suc)
+
+dive_locations <- st_as_sf(x = dive_data, 
+                           coords = c("otter_long_deg", "otter_lat_deg"),
+                           crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0")
+
+alaska <- read_sf(here("data", "alaska_shape", "tl_2017_02_place.shp")) %>% 
+  select(NAME, ALAND) %>% 
+  rename(county_name = NAME, land_area = ALAND)
+
+
 
 ui <- fluidPage(
     theme = shinytheme("cerulean"),
@@ -46,19 +58,18 @@ ui <- fluidPage(
                            tabPanel("Dive Type",
                                     sidebarLayout(
                                         sidebarPanel(selectInput("select", label = h3("Select dive type:"), 
+                                                                 inputId = "select_dive",
                                                                  choices = list(
-                                                                     "All dives" = 1, "Successful dives" = 2, "Unsuccessful dives" = 3), 
-                                                                 selected = 1),
-                                                     
-                                                     hr(),
-                                                     fluidRow(column(3, verbatimTextOutput("value")))
-                                                     
-                                                     
+                                                                     "Successful Dives" = "Y", "Unsuccessful dives" = "N", "Travel dive" = "T", 
+                                                                     "Previous dive" = "C", "Interactive otter dive" = "I", "Unknonw" = "U"),
+                                                    
                                                      
                                                      ),
-                                        mainPanel("map coming soon")
-                                    )
+                                       
                                     ),
+                                    mainPanel("Interactive map of sea otter foraging dives",
+                                              tmapOutput("dive_map"))
+                                    )),
                            tabPanel("Prey",
                                     sidebarLayout(
                                       sidebarPanel(
@@ -129,6 +140,25 @@ server <- function(input, output) {
   
   output$summary_table <- renderTable(char_reactive())
   
+
+  dive_reactive <- reactive({
+    
+    dive_locations %>%
+      filter(suc %in% input$select_dive)
+      
+      
+  })
+  
+  output$dive_map = renderTmap({
+    tmap_mode(mode = "view") 
+    
+    tm_shape(alaska) +
+      tm_fill("land_area") +
+      tm_shape(dive_locations) + 
+      tm_dots()
+    
+  })
+
   lm_reactive <- reactive({
     otters %>% 
       filter(age %in% input$pick_regress)
@@ -147,6 +177,7 @@ server <- function(input, output) {
       ggpubr::stat_regline_equation(label.x = 17, label.y = 300)
   )
   
+
 }
 
 shinyApp(ui = ui, server = server)
