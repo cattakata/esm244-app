@@ -18,6 +18,21 @@ prey <- foraging %>%
   rename(prey_caught = n) %>% 
   filter(suc == "Y")
 
+age_sex <- foraging %>% 
+  filter(sex == "F" | sex == "M") %>% 
+  filter(age == "J" | age == "A")
+
+dive_data <- foraging %>% 
+  select(otter_lat_deg, otter_long_deg, suc)
+
+dive_locations <- st_as_sf(x = dive_data, 
+                           coords = c("otter_long_deg", "otter_lat_deg"),
+                           crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0")
+
+alaska <- read_sf(here("data", "alaska_shape", "tl_2017_02_place.shp")) %>% 
+  select(NAME, ALAND) %>% 
+  rename(county_name = NAME, land_area = ALAND)
+
 
 
 ui <- fluidPage(
@@ -43,59 +58,18 @@ ui <- fluidPage(
                            tabPanel("Dive Type",
                                     sidebarLayout(
                                         sidebarPanel(selectInput("select", label = h3("Select dive type:"), 
+                                                                 inputId = "select_dive",
                                                                  choices = list(
-                                                                     "All dives" = 1, "Successful dives" = 2, "Unsuccessful dives" = 3), 
+                                                                     "Successful Dives" = "Y", "Unsuccessful dives" = "N", "Travel dive" = "T", 
+                                                                     "Previous dive" = "C", "Interactive otter dive" = "I", "Unknonw" = "U"), 
                                                                  selected = 1),
-                                                     
-                                                     hr(),
-                                                     fluidRow(column(3, verbatimTextOutput("value")))
-                                                     
-                                                     
+                                                    
                                                      
                                                      ),
-                                        mainPanel("map coming soon")
+                                        mainPanel("Interactive map of sea otter foraging dives",
+                                                  tmapOutput("dive_map"))
                                     )
                                     ),
-                           
-                           tabPanel("Cloud Cover",
-                                    sidebarLayout(
-                                        sidebarPanel(
-                                            fluidRow(
-                                                column(12,
-                                                       sliderInput("slider2", label = h3("Slider Range"), min = 0, 
-                                                                   max = 100, value = c(40, 60))
-                                                )
-                                            ),
-                                            
-                                            hr(),
-                                            
-                                            fluidRow(
-                                                column(12, verbatimTextOutput("value")),
-                                                column(12, verbatimTextOutput("range"))
-                                            )
-                                            
-                                            
-                                            
-                                        ),
-                                        mainPanel("Linear regression describing how successful a dive is, predicted by cloud cover")
-                                    )
-                                    ),
-                           tabPanel("Otter Age and Sex",
-                                    sidebarLayout(
-                                        sidebarPanel(checkboxGroupInput("checkGroup", label = h3("Select age and sex"), 
-                                                                        choices = list(
-                                                                            "Female" = 1, "Male" = 2, 
-                                                                            "Adult" = 3, "Juvenile" = 4),
-                                                                        selected = 1),
-                                                     
-                                                     
-                                                     hr(),
-                                                     fluidRow(column(3, verbatimTextOutput("value")))
-                                                     ),
-                                        mainPanel("Summary statistics for age and sex selected")
-                                    )
-                                    ),
-                           
                            tabPanel("Prey",
                                     sidebarLayout(
                                       sidebarPanel(
@@ -103,10 +77,48 @@ ui <- fluidPage(
                                                                       label = "Choose species:",
                                                                       choices = unique(prey$prey_item))
                                       ),
-                                      mainPanel("plot of prey successfully obtained",
+                                      mainPanel("plot of prey successfully obtained", 
                                                 plotOutput("prey_plot"))
                                     )
+                           ),
+                           
+                           
+                           tabPanel("Cloud Cover",
+                                    sidebarLayout(
+                                      sidebarPanel(
+                                        fluidRow(
+                                          column(12,
+                                                 sliderInput("slider2", label = h3("Slider Range"), min = 0, 
+                                                             max = 100, value = c(40, 60))
+                                          )
+                                        ),
+                                        
+                                        hr(),
+                                        
+                                        fluidRow(
+                                          column(12, verbatimTextOutput("value")),
+                                          column(12, verbatimTextOutput("range"))
+                                        )
+                                        
+                                        
+                                        
+                                      ),
+                                      mainPanel("Linear regression describing how successful a dive is, predicted by cloud cover")
+                                    )
+                           ),
+                           
+                           tabPanel("Otter Age and Sex",
+                                    sidebarLayout(
+                                      sidebarPanel(checkboxGroupInput(inputId = "characteristics",
+                                                                      label = "Select sex AND age:",
+                                                                      choices = c("Male" = "M", "Female" = "F",
+                                                                                  "Adult" = "A", "Juvenile" = "J"))
+                                      ),
+                                      mainPanel("Summary statistics of dive time and number of prey caught for age and sex selected",
+                                                tableOutput("summary_table"))
+                                    )
                            )
+                           
                            
                            
                 )
@@ -129,6 +141,32 @@ server <- function(input, output) {
     
   )
   
+  char_reactive <- reactive ({
+    age_sex %>% 
+      filter(age %in% input$characteristics) %>% 
+      filter(sex %in% input$characteristics) %>% 
+      group_by(sex, age) %>% 
+      summarise(dive_time = round(mean(dt, na.rm = TRUE),2),
+                prey_quantity = round(mean(prey_qty, na.rm = TRUE), 2) 
+      )
+  })
+  
+  output$summary_table <- renderTable(char_reactive())
+  
+  dive_reactive <- reactive({
+    
+    dive_data %>%
+      filter(suc %in% input$select_dive)
+  })
+  
+  output$dive_map = renderTmap({
+    tmap_mode(mode = "view")
+    
+    tm_shape(alaska) +
+      tm_fill("land_area") +
+      tm_shape(dive_reactive) + 
+      tm_dots()
+  })
 }
 
 shinyApp(ui = ui, server = server)
