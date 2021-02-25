@@ -83,27 +83,14 @@ ui <- fluidPage(
                            ),
                            
                            
-                           tabPanel("Cloud Cover",
+                           tabPanel("Dive time and prey quantity",
                                     sidebarLayout(
-                                      sidebarPanel(
-                                        fluidRow(
-                                          column(12,
-                                                 sliderInput("slider2", label = h3("Slider Range"), min = 0, 
-                                                             max = 100, value = c(40, 60))
-                                          )
-                                        ),
-                                        
-                                        hr(),
-                                        
-                                        fluidRow(
-                                          column(12, verbatimTextOutput("value")),
-                                          column(12, verbatimTextOutput("range"))
-                                        )
-                                        
-                                        
-                                        
-                                      ),
-                                      mainPanel("Linear regression describing how successful a dive is, predicted by cloud cover")
+                                      sidebarPanel(selectInput("select", label = h3("Select dive type:"), 
+                                                               inputId = "pick_regress",
+                                                               choices = c("Adult" = "A", "Juvenile" = "J"))
+                                                   ),
+                                      mainPanel("Predicting number of prey caught by dive time",
+                                                plotOutput("regression_plot"))
                                     )
                            ),
                            
@@ -153,6 +140,7 @@ server <- function(input, output) {
   
   output$summary_table <- renderTable(char_reactive())
   
+
   dive_reactive <- reactive({
     
     dive_locations %>%
@@ -170,6 +158,26 @@ server <- function(input, output) {
       tm_dots()
     
   })
+
+  lm_reactive <- reactive({
+    otters %>% 
+      filter(age %in% input$pick_regress)
+  })
+  
+  output$regression_plot <- renderPlot(
+    ggplot(data = lm_reactive(), aes(x = prey_qty, y = dt)) +
+      geom_jitter(size = 2) +
+      geom_smooth(method = "lm",
+                  color = "red",
+                  size = 0.5,
+                  fill = "gray10",
+                  alpha = 0.5) + # geom_smooth is to add a linear model to a scatterplot
+      labs(x = "Prey quantity", y = "Dive time (seconds)") +
+      theme_light() +
+      ggpubr::stat_regline_equation(label.x = 17, label.y = 300)
+  )
+  
+
 }
 
 shinyApp(ui = ui, server = server)
