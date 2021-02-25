@@ -5,6 +5,8 @@ library(shinythemes)
 library(leaflet)
 library(janitor)
 library(lubridate)
+library(sf)
+library(tmap)
 
 foraging <- read.csv(here("data","2018_foraging.csv")) %>% 
   clean_names() %>% 
