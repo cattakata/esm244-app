@@ -61,15 +61,15 @@ ui <- fluidPage(
                                                                  inputId = "select_dive",
                                                                  choices = list(
                                                                      "Successful Dives" = "Y", "Unsuccessful dives" = "N", "Travel dive" = "T", 
-                                                                     "Previous dive" = "C", "Interactive otter dive" = "I", "Unknonw" = "U"), 
-                                                                 selected = 1),
+                                                                     "Previous dive" = "C", "Interactive otter dive" = "I", "Unknonw" = "U"),
                                                     
                                                      
                                                      ),
-                                        mainPanel("Interactive map of sea otter foraging dives",
-                                                  tmapOutput("dive_map"))
-                                    )
+                                       
                                     ),
+                                    mainPanel("Interactive map of sea otter foraging dives",
+                                              tmapOutput("dive_map"))
+                                    )),
                            tabPanel("Prey",
                                     sidebarLayout(
                                       sidebarPanel(
@@ -155,17 +155,20 @@ server <- function(input, output) {
   
   dive_reactive <- reactive({
     
-    dive_data %>%
+    dive_locations %>%
       filter(suc %in% input$select_dive)
+      
+      
   })
   
   output$dive_map = renderTmap({
-    tmap_mode(mode = "view")
+    tmap_mode(mode = "view") 
     
     tm_shape(alaska) +
       tm_fill("land_area") +
-      tm_shape(dive_reactive) + 
+      tm_shape(dive_locations) + 
       tm_dots()
+    
   })
 }
 
