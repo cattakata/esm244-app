@@ -36,6 +36,7 @@ ui <- fluidPage(
                            tabPanel("About this site",
                                     leaflet() %>% 
                                       addTiles() %>% 
+                                      setView(lng = -134.105784, lat = 56.336226, zoom = 3.25) %>% 
                                       addMarkers(lng = -134.105784, lat = 56.336226, popup = "Prince of Wales, AK"),
                                     tags$div(
                                       tags$br(), tags$br(), tags$h4("Background"),
@@ -43,7 +44,7 @@ ui <- fluidPage(
                                       tags$br(),tags$br(),tags$h4("Code"),
                                       "Code and input data used to generate this Shiny mapping tool are available as ",tags$a(href="https://knb       .ecoinformatics.org/view/urn%3Auuid%3Abbf026b7-ca66-412e-9243-33532506c4e0", "sea otter foraging data."),
                                       tags$br(),tags$br(),tags$h4("Sources"),
-                                      "Nicole LaRoche, Sydney King, and Heidi Pearson. 2020. Sea otter foraging data, visual observations from Prince of Wales, Alaska. Knowledge Network for Biocomplexity. urn:uuid:bbf026b7-ca66-412e-9243-33532506c4e0.",
+                                      "Nicole LaRoche, Sydney King, and Heidi Pearson. 2020. Sea otter foraging data, visual observations from Prince of Wales, Alaska. Knowledge Network for Biocomplexity.",
                                       tags$br(),tags$br(),tags$h4("Authors"),
                                       "Lory Salazar, Master's Candidate at The Bren School of Environmental Science & Management",tags$br(),
                                       "Catherine Takata, Master's Candidate at The Bren School of Environmental Science & Management ",tags$br(),
@@ -51,7 +52,7 @@ ui <- fluidPage(
                                     ),
                            tabPanel("Dive Type",
                                     sidebarLayout(
-                                        sidebarPanel(selectInput("select_dive", label = "Select dive type::",
+                                        sidebarPanel(selectInput("select_dive", label = "Select dive type:",
                                                                  choices = list("All dives", 
                                                                                 "Successful Dives" = "Y", 
                                                                                 "Unsuccessful dives" = "N", 
