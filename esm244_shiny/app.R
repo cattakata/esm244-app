@@ -7,6 +7,7 @@ library(janitor)
 library(lubridate)
 library(sf)
 library(tmap)
+library(shinyWidgets)
 
 foraging <- read.csv(here("data","2018_foraging.csv")) %>% 
   clean_names() %>% 
@@ -26,15 +27,6 @@ age_sex <- foraging %>%
 
 dive_data <- foraging %>% 
   select(otter_lat_deg, otter_long_deg, suc)
-
-dive_locations <- st_as_sf(x = dive_data, 
-                           coords = c("otter_long_deg", "otter_lat_deg"),
-                           crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0")
-
-alaska <- read_sf(here("data", "alaska_shape", "tl_2017_02_place.shp")) %>% 
-  select(NAME, ALAND) %>% 
-  rename(county_name = NAME, land_area = ALAND)
-
 
 
 ui <- fluidPage(
@@ -59,19 +51,20 @@ ui <- fluidPage(
                                     ),
                            tabPanel("Dive Type",
                                     sidebarLayout(
-                                        sidebarPanel(selectInput("select", label = h3("Select dive type:"), 
-                                                                 inputId = "select_dive",
-                                                                 choices = list(
-                                                                     "Successful Dives" = "Y", "Unsuccessful dives" = "N", "Travel dive" = "T", 
-                                                                     "Previous dive" = "C", "Interactive otter dive" = "I", "Unknonw" = "U"),
-                                                    
-                                                     
-                                                     ),
+                                        sidebarPanel(selectInput("select_dive", label = "Select dive type::",
+                                                                 choices = list("All dives", 
+                                                                                "Successful Dives" = "Y", 
+                                                                                "Unsuccessful dives" = "N", 
+                                                                                "Travel dive" = "T", 
+                                                                                "Previous dive" = "C", 
+                                                                                "Interactive otter dive" = "I", "Unknown" = "U"
+                                                                 ),
+                                                     )
                                        
                                     ),
-                                    mainPanel("Interactive map of sea otter foraging dives",
-                                              tmapOutput("dive_map"))
+                                    mainPanel(leafletOutput("map"))
                                     )),
+                           
                            tabPanel("Prey",
                                     sidebarLayout(
                                       sidebarPanel(
@@ -115,7 +108,7 @@ ui <- fluidPage(
                 
 )
 
-server <- function(input, output) {
+server <- function(input, output, session) {
   
   prey_reactive <- reactive({
     
@@ -143,22 +136,30 @@ server <- function(input, output) {
   output$summary_table <- renderTable(char_reactive())
   
 
-  dive_reactive <- reactive({
-    
-    dive_locations %>%
-      filter(suc %in% input$select_dive)
-      
-      
+  dive_react <- reactive({
+    if (input$select_dive == "All dives") {
+      dive_data
+    } else {
+      filter(dive_data, suc == input$select_dive)
+    }
   })
   
-  output$dive_map = renderTmap({
-    tmap_mode(mode = "view") 
-    
-    tm_shape(alaska) +
-      tm_fill("land_area") +
-      tm_shape(dive_locations) + 
-      tm_dots()
-    
+  output$map <- renderLeaflet({
+    leaflet(dive_react()) %>%
+      addProviderTiles(providers$Esri.WorldTopoMap) %>%
+      addMarkers(~otter_long_deg, ~otter_lat_deg, 
+                 label = ~suc, 
+                 labelOptions = labelOptions(textsize = "12px"),
+                 popup = ~suc)
+  })
+  
+  observe({
+    leafletProxy("map", data = dive_react()) %>%
+      clearShapes() %>%
+      addMarkers(~otter_long_deg, ~otter_lat_deg, 
+                 label = ~suc, 
+                 labelOptions = labelOptions(textsize = "12px"),
+                 popup = ~suc)
   })
 
   lm_reactive <- reactive({
