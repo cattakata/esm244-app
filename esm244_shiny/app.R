@@ -36,6 +36,7 @@ ui <- fluidPage(
                            tabPanel("About this site",
                                     leaflet() %>% 
                                       addTiles() %>% 
+                                      addProviderTiles(providers$Esri.WorldStreetMap) %>% 
                                       setView(lng = -134.105784, lat = 56.336226, zoom = 3.25) %>% 
                                       addMarkers(lng = -134.105784, lat = 56.336226, popup = "Prince of Wales, AK"),
                                     tags$div(
