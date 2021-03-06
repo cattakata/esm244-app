@@ -37,7 +37,10 @@ ui <- fluidPage(
                                     leaflet() %>% 
                                       addTiles() %>% 
                                       addProviderTiles(providers$Esri.WorldStreetMap) %>% 
-                                      setView(lng = -134.105784, lat = 56.336226, zoom = 3.25) %>% 
+                                      addMiniMap(width = 200,
+                                                 height = 150,
+                                                 centerFixed = FALSE) %>% 
+                                      setView(lng = -134.105784, lat = 56.336226, zoom = 4) %>% 
                                       addMarkers(lng = -134.105784, lat = 56.336226, popup = "Prince of Wales, AK"),
                                     tags$div(
                                       tags$br(), tags$br(), tags$h4("Background"),
