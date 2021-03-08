@@ -9,6 +9,7 @@ library(sf)
 library(tmap)
 library(shinyWidgets)
 library(kableExtra)
+library(broom)
 
 foraging <- read.csv(here("data","2018_foraging.csv")) %>% 
   clean_names() %>% 
@@ -246,7 +247,7 @@ server <- function(input, output, session) {
   })
   
   output$regression_table <- renderTable(
-    blr_tidy 
+    blr_tidy
   )
     
   
