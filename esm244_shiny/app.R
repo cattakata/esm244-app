@@ -57,7 +57,7 @@ blr_tidy$p.value <- round(blr_tidy$p.value, digit = 3)
 
 blr_tidy %>% 
   mutate(p.value = case_when(p.value < 0.0001 ~ "< 0.0001",
-                             TRUE ~ as.character(p.value)))
+                             TRUE ~ as.character(p.value))) 
 
 blr_fitted <- success_blr %>% 
   broom::augment(type.predict = "response")
@@ -123,7 +123,19 @@ ui <- fluidPage(theme = "style.css",
                                       sidebarPanel(
                                                    checkboxGroupInput(inputId = "pick_prey",
                                                                       label = "Choose species:",
-                                                                      choices = unique(prey_10$prey_item))
+                                                                      choices = c("CA sea cucumber" = "APC",
+                                                                                  "Cancer crab" = "CAN",
+                                                                                  "Clam, unidentified" = "CLA",
+                                                                                  "Nuttal's cockle" = "CLN",
+                                                                                  "Crab, unidentified" = "CRA",
+                                                                                  "Soft-shell clam" = "MYT",
+                                                                                  "Pandalus shrimp" = "PAS",
+                                                                                  "Littleneck clam" = "PRS",
+                                                                                  "Butter clam" = "SAG",
+                                                                                  "Marine snail, various" = "SNA",
+                                                                                  "Unknown" = "UNK"),
+                                                                      selected = c("APC", "CAN", "CLA", "CLN", "CRA", "MYT",
+                                                                                   "PAS", "PRS", "SAG", "SNA", "UNK"))
                                       ),
                                       mainPanel(plotOutput("prey_plot"))
                                     )
@@ -137,9 +149,10 @@ ui <- fluidPage(theme = "style.css",
                                                           choices = c("Male" = "M", 
                                                                       "Female" = "F",
                                                                       "Adult" = "A", 
-                                                                      "Juvenile" = "J"))
+                                                                      "Juvenile" = "J"),
+                                                          selected = c("M", "A"))
                           ),
-                          mainPanel(tableOutput("summary_table"))
+                          mainPanel(htmlOutput("summary_table"))
                         )
                ),
                            
@@ -195,6 +208,8 @@ ui <- fluidPage(theme = "style.css",
 )
 
 server <- function(input, output, session) {
+  library(dplyr)
+  library(kableExtra)
   
   prey_reactive <- reactive({
     
@@ -216,10 +231,12 @@ server <- function(input, output, session) {
       group_by(sex, age) %>% 
       summarise(dive_time = round(mean(dt, na.rm = TRUE),2),
                 prey_quantity = round(mean(prey_qty, na.rm = TRUE), 2) 
-      )
+      ) %>% 
+      kable("html", col.names = c("Sex", "Age", "Mean Dive Time (seconds)", "Mean Prey Quantity")) %>%
+      kable_styling("striped") 
   })
   
-  output$summary_table <- renderTable(char_reactive())
+  output$summary_table <- renderText(char_reactive())
   
 
   dive_react <- reactive({
