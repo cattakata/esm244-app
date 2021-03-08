@@ -71,9 +71,9 @@ otters_suc <- otters %>%
 
 levels(otters_suc$suc) # [1] "N" "Y"
 
-otters_blr <- glm(suc ~ dt + rain + age, 
-                            data = otters_suc, 
-                            family = "binomial")
+otters_blr <- glm(suc ~ sky + age, 
+                  data = otters_suc, 
+                  family = "binomial")
 
 otters_blr
 summary(otters_blr)
@@ -95,8 +95,6 @@ otters_lm <- lm(prey_qty ~ dt, data = otters)
 
 summary(otters)
 
-# Below, I use broom to tidy the table we got from the linear model.
-
 otters_lm_tidy <- broom::tidy(otters_lm)
 
 # plot
@@ -110,6 +108,70 @@ ggplot(data = otters, aes(x = prey_qty, y = dt)) +
   labs(x = "Prey quantity", y = "Dive time (seconds)") +
   theme_light() +
     ggpubr::stat_regline_equation(label.x = 17, label.y = 300)
+```
+
+
+
+```{r}
+# logistic regression: what is the probability of a dive being successful, based on otter age and sex?
+# independent variable: categorical (age, sex)
+# dependent variable: dichotomous (yes = 1, no = 0)
+
+blr_subset <- age_sex %>% 
+  filter(suc == "Y" |
+         suc == "N") %>% 
+  mutate(suc = fct_drop(suc))
+
+blr_subset$suc <- as.factor(blr_subset$suc)
+
+levels(blr_subset$suc) # N = 0, Y = 1. so Y is our reference level; we will be looking at probability of a successful dive
+
+success_blr <- glm(suc ~ age + sex,
+                   data = blr_subset,
+                   family = "binomial")
+
+age_blr <- glm(suc ~ age,
+                   data = blr_subset,
+                   family = "binomial")
+
+summary(age_blr)
+
+summary(success_blr)
+# Reference levels are adult and female (bc they don't show up in the model)
+# Based on the p-value, sex is significantly non zero (??)
+# Compared to a reference level of "adult", if an otter is a "juvenile", it is more likely to have a successful dive
+# Compared to a reference level of "female", if an otter is a "male", it is less likely to have a successful dive
+
+ggplot(data = blr_subset, aes(x = suc, y = age)) +
+  geom_jitter() 
+
+ggplot(data = blr_subset, aes(x = suc, y = sex)) +
+  geom_jitter()
+
+blr_fitted <- success_blr %>% 
+  broom::augment(type.predict = "response")
+
+
+sex_plot <- ggplot(data = blr_fitted, aes(x = sex, y = .fitted)) +
+  geom_col() +
+  labs(x = "Sex",
+       y = "Probability of outcome successful")
+
+age_plot <- ggplot(data = blr_fitted, aes(x = age, y = .fitted)) +
+  geom_col() +
+  labs(x = "Age",
+       y = "Probability of outcome successful")
+
+
+blr_tidy <- broom::tidy(success_blr)
+blr_tidy
+
+blr_tidy %>% 
+  mutate(p.value = case_when(p.value < 0.0001 ~ "< 0.0001")) %>% 
+  kable(col.names = c("Term", "Estimate", "Standard Error", "Statistic", "P-value")) %>% 
+  kable_styling(full_width = FALSE,
+                bootstrap_options = "striped")
+
 ```
 
 
