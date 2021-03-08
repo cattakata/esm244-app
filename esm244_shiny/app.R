@@ -34,15 +34,14 @@ ui <- fluidPage(
     navbarPage("Sea otter foraging",
                
                           tabPanel("Home",
-                                  titlePanel("Alaskan Sea Otter Foraging"),
-                                  mainPanel(
-                                    img(src = "about_otter.png", 
-                                        height = 500, 
-                                        width = 750)
+                                  HTML(
+                                    "<section class='banner'>
+                                    <h2 class='parallax'>SEA OTTER FORAGING</h2>
+                                    </section>"
                                   )
                                   ),
                
-                           tabPanel("About this site",
+                           tabPanel("About",
                                     leaflet() %>% 
                                       addTiles() %>% 
                                       addProviderTiles(providers$Esri.WorldStreetMap) %>% 
