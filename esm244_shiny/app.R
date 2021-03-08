@@ -28,6 +28,29 @@ age_sex <- foraging %>%
 dive_data <- foraging %>% 
   select(otter_lat_deg, otter_long_deg, suc)
 
+blr_subset <- age_sex %>% 
+  filter(suc == "Y" |
+           suc == "N") %>% 
+  mutate(suc = fct_drop(suc))
+
+blr_subset$suc <- as.factor(blr_subset$suc)
+
+success_blr <- glm(suc ~ age + sex,
+                   data = blr_subset,
+                   family = "binomial")
+
+sex_plot <- ggplot(data = blr_fitted, aes(x = sex, y = .fitted)) +
+  geom_col() +
+  labs(x = "Sex",
+       y = "Probability of outcome successful")
+
+age_plot <- ggplot(data = blr_fitted, aes(x = age, y = .fitted)) +
+  geom_col() +
+  labs(x = "Age",
+       y = "Probability of outcome successful")
+
+blr_fitted <- success_blr %>% 
+  broom::augment(type.predict = "response")
 
 ui <- fluidPage(theme = "style.css",
     navbarPage("Sea otter foraging",
@@ -110,12 +133,14 @@ ui <- fluidPage(theme = "style.css",
                            tabPanel("Prey and Dive",
                                     titlePanel("Prey Quantity by Dive Time"),
                                     sidebarLayout(
-                                      sidebarPanel(selectInput("select", 
-                                                               label = h3("Select dive type:"), 
+
+                                      sidebarPanel(selectInput("select", label = h3("Select predictor variable:"), 
                                                                inputId = "pick_regress",
-                                                               choices = c("Adult" = "A", "Juvenile" = "J"))
+                                                               choices = c("Age" = "age", "Sex" = "sex"))
                                                    ),
+                                      
                                       mainPanel(plotOutput("regression_plot"))
+                                      
                                     )
                            ),
                            
@@ -194,23 +219,18 @@ server <- function(input, output, session) {
                  popup = ~suc)
   })
 
-  lm_reactive <- reactive({
-    otters %>% 
-      filter(age %in% input$pick_regress)
+  blr_reactive <- reactive({
+    blr_fitted %>% 
+      select(input$pick_regress, .fitted) 
   })
   
-  output$regression_plot <- renderPlot(
-    ggplot(data = lm_reactive(), aes(x = prey_qty, y = dt)) +
-      geom_jitter(size = 2) +
-      geom_smooth(method = "lm",
-                  color = "red",
-                  size = 0.5,
-                  fill = "gray10",
-                  alpha = 0.5) + # geom_smooth is to add a linear model to a scatterplot
-      labs(x = "Prey quantity", y = "Dive time (seconds)") +
-      theme_light() +
-      ggpubr::stat_regline_equation(label.x = 17, label.y = 300)
-  )
+  
+  output$regression_plot <- 
+    renderPlot({
+      
+      if (input$pick_regress == "age")  {print(age_plot)}   
+      if (input$pick_regress == "sex")  {print(sex_plot)}  
+  })
   
 
 }
