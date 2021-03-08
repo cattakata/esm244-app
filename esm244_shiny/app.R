@@ -36,7 +36,9 @@ ui <- fluidPage(
                           tabPanel("Home",
                                   titlePanel("Alaskan Sea Otter Foraging"),
                                   mainPanel(
-                                    img(src = "about_otter.png", height = 500, width = 750)
+                                    img(src = "about_otter.png", 
+                                        height = 500, 
+                                        width = 750)
                                   )
                                   ),
                
