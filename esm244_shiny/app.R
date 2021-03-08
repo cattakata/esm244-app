@@ -31,8 +31,15 @@ dive_data <- foraging %>%
 
 ui <- fluidPage(
     theme = "style.css",
-                
-                navbarPage("Sea otter foraging",
+    navbarPage("Sea otter foraging",
+               
+                          tabPanel("Home",
+                                  titlePanel("Alaskan Sea Otter Foraging"),
+                                  mainPanel(
+                                    img(src = "about_otter.png", height = 500, width = 750)
+                                  )
+                                  ),
+               
                            tabPanel("About this site",
                                     leaflet() %>% 
                                       addTiles() %>% 
