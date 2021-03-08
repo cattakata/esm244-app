@@ -9,11 +9,13 @@ library(sf)
 library(tmap)
 library(shinyWidgets)
 
+# Read in data set 
 foraging <- read.csv(here("data","2018_foraging.csv")) %>% 
   clean_names() %>% 
   mutate(date = mdy(date)) %>% 
   rename(aerial_survey_yr = year)
 
+# Establish new data set to call for "prey type" tab 
 prey <- foraging %>% 
   select(suc, prey_item, date, age, prey_qty) %>% 
   group_by(prey_item) %>% 
@@ -25,9 +27,11 @@ age_sex <- foraging %>%
   filter(sex == "F" | sex == "M") %>% 
   filter(age == "J" | age == "A")
 
+# Establish a new data set for "dive type" based on latitude and longitude data  
 dive_data <- foraging %>% 
   select(otter_lat_deg, otter_long_deg, suc)
 
+# Establish new subsets for blr regression analysis of sex and age 
 blr_subset <- age_sex %>% 
   filter(suc == "Y" |
            suc == "N") %>% 
@@ -52,6 +56,8 @@ age_plot <- ggplot(data = blr_fitted, aes(x = age, y = .fitted)) +
 blr_fitted <- success_blr %>% 
   broom::augment(type.predict = "response")
 
+_____________________________________
+
 ui <- fluidPage(theme = "style.css",
     navbarPage("Sea otter foraging",
                
@@ -64,8 +70,8 @@ ui <- fluidPage(theme = "style.css",
                                     tags$br(), tags$br(), tags$h4(),
                                     "The sea otters of Prince Wales, Alaska, U.S., were relocated as a result of conservation efforts in 1968. Ecologist of the University of                                         Alaska and neighboring areas studied otters as a part of the Apex Predators, Ecosystems, and Community Sustainability (APECS) project                                       in order to study the impacts of the reintroduction on coastal communities. We will further manipulate data provided from APEC to create an                                             interactive interface to identify trends or significant effects."), 
                                   # mainPanel(
-                                  #   img(src = "eating.png", 
-                                  #       height = 250, 
+                                  #   img(src = "eating.png",
+                                  #       height = 250,
                                   #       width = 300,
                                   #       style = "display: block; margin-left: auto; margin-right: auto;")
                                   # )
@@ -134,7 +140,7 @@ ui <- fluidPage(theme = "style.css",
                                     titlePanel("Prey Quantity by Dive Time"),
                                     sidebarLayout(
 
-                                      sidebarPanel(selectInput("select", label = h3("Select predictor variable:"), 
+                                      sidebarPanel(selectInput("select", label = ("Select predictor variable:"), 
                                                                inputId = "pick_regress",
                                                                choices = c("Age" = "age", "Sex" = "sex"))
                                                    ),
