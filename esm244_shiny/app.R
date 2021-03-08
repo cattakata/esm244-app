@@ -52,35 +52,63 @@ age_plot <- ggplot(data = blr_fitted, aes(x = age, y = .fitted)) +
 blr_fitted <- success_blr %>% 
   broom::augment(type.predict = "response")
 
-ui <- fluidPage(
-    theme = shinytheme("cerulean"),
-                
-                navbarPage("Sea otter foraging",
-                           tabPanel("About this site",
-                                    leaflet() %>% 
-                                      addTiles() %>% 
-                                      addMarkers(lng = -134.105784, lat = 56.336226, popup = "Prince of Wales, AK"),
-                                    tags$div(
-                                      tags$br(), tags$br(), tags$h4("Background"),
-                                      "The sea otters of Prince Wales, Alaska, U.S., were relocated as a result of conservation efforts in 1968.                                             Ecologist of the University of Alaska and neighboring areas studied these otters as a part of the Apex Predators,                                        Ecosystems, and Community Sustainability (APECS) project in order to study the impacts of the reintroduction on                                          coastal communities. We will further manipulate the data provided to create an interactive interface to identify                                         trends or significant effects.", 
-                                      tags$br(),tags$br(),tags$h4("Code"),
-                                      "Code and input data used to generate this Shiny mapping tool are available as ",tags$a(href="https://knb       .ecoinformatics.org/view/urn%3Auuid%3Abbf026b7-ca66-412e-9243-33532506c4e0", "sea otter foraging data."),
+ui <- fluidPage(theme = "style.css",
+    navbarPage("Sea otter foraging",
+               
+                          tabPanel("Home",
+                                  HTML(
+                                    "<section class='banner'>
+                                    <h2 class='parallax'>SEA OTTER FORAGING</h2>
+                                    </section>"),
+                                  tags$div(
+                                    tags$br(), tags$br(), tags$h4(),
+                                    "The sea otters of Prince Wales, Alaska, U.S., were relocated as a result of conservation efforts in 1968. Ecologist of the University of                                         Alaska and neighboring areas studied otters as a part of the Apex Predators, Ecosystems, and Community Sustainability (APECS) project                                       in order to study the impacts of the reintroduction on coastal communities. We will further manipulate data provided from APEC to create an                                             interactive interface to identify trends or significant effects."), 
+                                  # mainPanel(
+                                  #   img(src = "eating.png", 
+                                  #       height = 250, 
+                                  #       width = 300,
+                                  #       style = "display: block; margin-left: auto; margin-right: auto;")
+                                  # )
+                          ),
+               
+                           tabPanel("About",
+                                    titlePanel("About"),
+                                      tags$div(tags$br(),tags$br(),tags$h4("Code"),
+                                      "Code and input data used to generate this Shiny mapping tool are available as ",tags$a(href="https://knb.ecoinformatics.org/view                                                  /urn%3Auuid%3Abbf026b7-ca66-412e-9243-33532506c4e0", "sea otter foraging data."),
                                       tags$br(),tags$br(),tags$h4("Sources"),
-                                      "Nicole LaRoche, Sydney King, and Heidi Pearson. 2020. Sea otter foraging data, visual observations from Prince of Wales, Alaska. Knowledge Network for Biocomplexity. urn:uuid:bbf026b7-ca66-412e-9243-33532506c4e0.",
+                                      "Nicole LaRoche, Sydney King, and Heidi Pearson. 2020. Sea otter foraging data, visual observations from Prince of Wales, Alaska. Knowledge                                        Network for Biocomplexity.",
                                       tags$br(),tags$br(),tags$h4("Authors"),
                                       "Lory Salazar, Master's Candidate at The Bren School of Environmental Science & Management",tags$br(),
                                       "Catherine Takata, Master's Candidate at The Bren School of Environmental Science & Management ",tags$br(),
+                                      tags$br(),tags$br(),tags$h4("Research Location"),
+                                      
+                                      leaflet() %>% 
+                                        addTiles() %>% 
+                                        addProviderTiles(providers$Esri.WorldStreetMap) %>% 
+                                        addMiniMap(width = 200,
+                                                   height = 150,
+                                                   centerFixed = FALSE) %>% 
+                                        setView(lng = -134.105784, 
+                                                lat = 56.336226, 
+                                                zoom = 4) %>% 
+                                        addMarkers(lng = -134.105784, 
+                                                   lat = 56.336226, 
+                                                   popup = "Prince of Wales, AK"),
                                     )
                                     ),
+                           
                            tabPanel("Dive Type",
+                                    titlePanel("Dive Type"),
                                     sidebarLayout(
-                                        sidebarPanel(selectInput("select_dive", label = "Select dive type::",
+                                        sidebarPanel(selectInput("select_dive", 
+                                                                 label = "Select dive type:",
                                                                  choices = list("All dives", 
                                                                                 "Successful Dives" = "Y", 
                                                                                 "Unsuccessful dives" = "N", 
                                                                                 "Travel dive" = "T", 
                                                                                 "Previous dive" = "C", 
-                                                                                "Interactive otter dive" = "I", "Unknown" = "U"
+                                                                                "Interactive otter dive" = "I", 
+                                                                                "Unknown" = "U"
                                                                  ),
                                                      )
                                        
@@ -88,39 +116,45 @@ ui <- fluidPage(
                                     mainPanel(leafletOutput("map"))
                                     )),
                            
-                           tabPanel("Prey",
+                           
+                           tabPanel("Prey Type",
+                                    titlePanel("Prey Type"),
                                     sidebarLayout(
                                       sidebarPanel(
                                                    checkboxGroupInput(inputId = "pick_prey",
                                                                       label = "Choose species:",
                                                                       choices = unique(prey$prey_item))
                                       ),
-                                      mainPanel("plot of prey successfully obtained", 
-                                                plotOutput("prey_plot"))
+                                      mainPanel(plotOutput("prey_plot"))
                                     )
                            ),
                            
                            
-                           tabPanel("Dive time and prey quantity",
+                           tabPanel("Prey and Dive",
+                                    titlePanel("Prey Quantity by Dive Time"),
                                     sidebarLayout(
+
                                       sidebarPanel(selectInput("select", label = h3("Select predictor variable:"), 
                                                                inputId = "pick_regress",
                                                                choices = c("Age" = "age", "Sex" = "sex"))
                                                    ),
-                                      mainPanel("Predicting success of foraging dive",
-                                                plotOutput("regression_plot"))
+                                      
+                                      mainPanel(plotOutput("regression_plot"))
+                                      
                                     )
                            ),
                            
-                           tabPanel("Otter Age and Sex",
+                           tabPanel("Otter Characteristics",
+                                    titlePanel("Otter Characteristics"),
                                     sidebarLayout(
                                       sidebarPanel(checkboxGroupInput(inputId = "characteristics",
                                                                       label = "Select sex AND age:",
-                                                                      choices = c("Male" = "M", "Female" = "F",
-                                                                                  "Adult" = "A", "Juvenile" = "J"))
+                                                                      choices = c("Male" = "M", 
+                                                                                  "Female" = "F",
+                                                                                  "Adult" = "A", 
+                                                                                  "Juvenile" = "J"))
                                       ),
-                                      mainPanel("Summary statistics of dive time and number of prey caught for age and sex selected",
-                                                tableOutput("summary_table"))
+                                      mainPanel(tableOutput("summary_table"))
                                     )
                            )
                            
