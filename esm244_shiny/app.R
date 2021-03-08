@@ -53,7 +53,7 @@ blr_tidy$p.value <- round(blr_tidy$p.value, digit = 3)
 
 blr_tidy %>% 
   mutate(p.value = case_when(p.value < 0.0001 ~ "< 0.0001",
-                             TRUE ~ as.character(p.value)))
+                             TRUE ~ as.character(p.value))) 
 
 blr_fitted <- success_blr %>% 
   broom::augment(type.predict = "response")
@@ -134,7 +134,7 @@ ui <- fluidPage(theme = "style.css",
                                                                       "Adult" = "A", 
                                                                       "Juvenile" = "J"))
                           ),
-                          mainPanel(tableOutput("summary_table"))
+                          mainPanel(htmlOutput("summary_table"))
                         )
                ),
                            
@@ -190,6 +190,8 @@ ui <- fluidPage(theme = "style.css",
 )
 
 server <- function(input, output, session) {
+  library(dplyr)
+  library(kableExtra)
   
   prey_reactive <- reactive({
     
@@ -211,10 +213,12 @@ server <- function(input, output, session) {
       group_by(sex, age) %>% 
       summarise(dive_time = round(mean(dt, na.rm = TRUE),2),
                 prey_quantity = round(mean(prey_qty, na.rm = TRUE), 2) 
-      )
+      ) %>% 
+      kable("html", col.names = c("Sex", "Age", "Mean Dive Time (seconds)", "Mean Prey Quantity")) %>%
+      kable_styling("striped") 
   })
   
-  output$summary_table <- renderTable(char_reactive())
+  output$summary_table <- renderText(char_reactive())
   
 
   dive_react <- reactive({
