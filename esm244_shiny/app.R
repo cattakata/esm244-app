@@ -57,7 +57,7 @@ blr_tidy$p.value <- round(blr_tidy$p.value, digit = 3)
 
 blr_tidy %>% 
   mutate(p.value = case_when(p.value < 0.0001 ~ "< 0.0001",
-                             TRUE ~ as.character(p.value)))
+                             TRUE ~ as.character(p.value))) 
 
 blr_fitted <- success_blr %>% 
   broom::augment(type.predict = "response")
@@ -87,16 +87,24 @@ ui <- fluidPage(theme = "style.css",
                                     </section>"),
                                   tags$div(
                                     tags$br(), tags$br(), tags$h4(),
-                                    h2("Exploring Sea Otter Data")),
+                                    h2("Otters of Prince Wales, Alaska")),
                                   tags$div(
                                     tags$br(), tags$br(), tags$h4(),
                                     "The sea otters of Prince Wales, Alaska, U.S., were relocated in 1968 as part of the Apex Predators, Ecosystems, and Community Sustainability (APECS) project. To understand the impacts of its reintroduction we will use interactive tools to identify trends or significant effects.",
                                     
-                                  img(src = "eating.png",
+                                    tags$div(
+                                      tags$br(), tags$br(), tags$h4(),
+                                      h2("Data Exploration")),
+                                    tags$div(
+                                      tags$br(), tags$br(), tags$h4(),
+                                      "We can explore the spatial extent of foraging dives sucess during food foraging, prey catch, and the relationship between otter characteristics and foraging patterns. The tools will react to user input to information through maps, tables, or plots.",
+                                    
+                                  img(src = "clip_otter.png",
                                       height = 250,
-                                      width = 300,
+                                      width = 500,
                                       style = "display: block; margin-left: auto; margin-right: auto;")
                           )
+                                  )
                           ),
                            
                            tabPanel("Dive Type",
@@ -125,7 +133,19 @@ ui <- fluidPage(theme = "style.css",
                                       sidebarPanel(
                                                    checkboxGroupInput(inputId = "pick_prey",
                                                                       label = "Choose species:",
-                                                                      choices = unique(prey_10$prey_item))
+                                                                      choices = c("CA sea cucumber" = "APC",
+                                                                                  "Cancer crab" = "CAN",
+                                                                                  "Clam, unidentified" = "CLA",
+                                                                                  "Nuttal's cockle" = "CLN",
+                                                                                  "Crab, unidentified" = "CRA",
+                                                                                  "Soft-shell clam" = "MYT",
+                                                                                  "Pandalus shrimp" = "PAS",
+                                                                                  "Littleneck clam" = "PRS",
+                                                                                  "Butter clam" = "SAG",
+                                                                                  "Marine snail, various" = "SNA",
+                                                                                  "Unknown" = "UNK"),
+                                                                      selected = c("APC", "CAN", "CLA", "CLN", "CRA", "MYT",
+                                                                                   "PAS", "PRS", "SAG", "SNA", "UNK"))
                                       ),
                                       mainPanel(plotOutput("prey_plot"))
                                     )
@@ -139,9 +159,10 @@ ui <- fluidPage(theme = "style.css",
                                                           choices = c("Male" = "M", 
                                                                       "Female" = "F",
                                                                       "Adult" = "A", 
-                                                                      "Juvenile" = "J"))
+                                                                      "Juvenile" = "J"),
+                                                          selected = c("M", "A"))
                           ),
-                          mainPanel(tableOutput("summary_table"))
+                          mainPanel(htmlOutput("summary_table"))
                         )
                ),
                            
@@ -201,6 +222,8 @@ ui <- fluidPage(theme = "style.css",
 )
 
 server <- function(input, output, session) {
+  library(dplyr)
+  library(kableExtra)
   
   prey_reactive <- reactive({
     
@@ -222,10 +245,12 @@ server <- function(input, output, session) {
       group_by(sex, age) %>% 
       summarise(dive_time = round(mean(dt, na.rm = TRUE),2),
                 prey_quantity = round(mean(prey_qty, na.rm = TRUE), 2) 
-      )
+      ) %>% 
+      kable("html", col.names = c("Sex", "Age", "Mean Dive Time (seconds)", "Mean Prey Quantity")) %>%
+      kable_styling("striped") 
   })
   
-  output$summary_table <- renderTable(char_reactive())
+  output$summary_table <- renderText(char_reactive())
   
 
   dive_react <- reactive({
