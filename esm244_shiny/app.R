@@ -8,6 +8,8 @@ library(lubridate)
 library(sf)
 library(tmap)
 library(shinyWidgets)
+library(kableExtra)
+library(broom)
 
 foraging <- read.csv(here("data","2018_foraging.csv")) %>% 
   clean_names() %>% 
@@ -38,6 +40,18 @@ blr_subset$suc <- as.factor(blr_subset$suc)
 success_blr <- glm(suc ~ age + sex,
                    data = blr_subset,
                    family = "binomial")
+
+blr_tidy <- broom::tidy(success_blr)
+
+blr_tidy$p.value <- round(blr_tidy$p.value, digit = 3)
+
+blr_tidy %>% 
+  mutate(p.value = case_when(p.value < 0.0001 ~ "< 0.0001",
+                             TRUE ~ as.character(p.value)))
+
+blr_fitted <- success_blr %>% 
+  broom::augment(type.predict = "response")
+
 
 sex_plot <- ggplot(data = blr_fitted, aes(x = sex, y = .fitted)) +
   geom_col() +
@@ -130,15 +144,15 @@ ui <- fluidPage(theme = "style.css",
                            ),
                            
                            
-                           tabPanel("Prey and Dive",
-                                    titlePanel("Prey Quantity by Dive Time"),
+                           tabPanel("Dive Success",
+                                    titlePanel("Predicting success of foraging dive by age and sex"),
                                     sidebarLayout(
 
-                                      sidebarPanel(selectInput("select", label = h3("Select predictor variable:"), 
+                                      sidebarPanel(selectInput("select", label = ("Select predictor variable:"), 
                                                                inputId = "pick_regress",
-                                                               choices = c("Age" = "age", "Sex" = "sex"))
+                                                               choices = c("Age" = "age", "Sex" = "sex")),
+                                                   tableOutput("regression_table")
                                                    ),
-                                      
                                       mainPanel(plotOutput("regression_plot"))
                                       
                                     )
@@ -232,7 +246,13 @@ server <- function(input, output, session) {
       if (input$pick_regress == "sex")  {print(sex_plot)}  
   })
   
+  output$regression_table <- renderTable(
+    blr_tidy
+  )
+    
+  
 
+  
 }
 
 shinyApp(ui = ui, server = server)
