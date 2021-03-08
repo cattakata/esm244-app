@@ -91,31 +91,6 @@ ui <- fluidPage(theme = "style.css",
                                   # )
                           ),
                
-                           tabPanel("About",
-                                    titlePanel("About"),
-                                      tags$div(tags$br(),tags$br(),tags$h4("Code"),
-                                      "Code and input data used to generate this Shiny mapping tool are available as ",tags$a(href="https://knb.ecoinformatics.org/view                                                  /urn%3Auuid%3Abbf026b7-ca66-412e-9243-33532506c4e0", "sea otter foraging data."),
-                                      tags$br(),tags$br(),tags$h4("Sources"),
-                                      "Nicole LaRoche, Sydney King, and Heidi Pearson. 2020. Sea otter foraging data, visual observations from Prince of Wales, Alaska. Knowledge                                        Network for Biocomplexity.",
-                                      tags$br(),tags$br(),tags$h4("Authors"),
-                                      "Lory Salazar, Master's Candidate at The Bren School of Environmental Science & Management",tags$br(),
-                                      "Catherine Takata, Master's Candidate at The Bren School of Environmental Science & Management ",tags$br(),
-                                      tags$br(),tags$br(),tags$h4("Research Location"),
-                                      
-                                      leaflet() %>% 
-                                        addTiles() %>% 
-                                        addProviderTiles(providers$Esri.WorldStreetMap) %>% 
-                                        addMiniMap(width = 200,
-                                                   height = 150,
-                                                   centerFixed = FALSE) %>% 
-                                        setView(lng = -134.105784, 
-                                                lat = 56.336226, 
-                                                zoom = 4) %>% 
-                                        addMarkers(lng = -134.105784, 
-                                                   lat = 56.336226, 
-                                                   popup = "Prince of Wales, AK"),
-                                    )
-                                    ),
                            
                            tabPanel("Dive Type",
                                     titlePanel("Dive Type"),
@@ -148,6 +123,20 @@ ui <- fluidPage(theme = "style.css",
                                       mainPanel(plotOutput("prey_plot"))
                                     )
                            ),
+               
+               tabPanel("Otter Characteristics",
+                        titlePanel("Otter Characteristics"),
+                        sidebarLayout(
+                          sidebarPanel(checkboxGroupInput(inputId = "characteristics",
+                                                          label = "Select sex AND age:",
+                                                          choices = c("Male" = "M", 
+                                                                      "Female" = "F",
+                                                                      "Adult" = "A", 
+                                                                      "Juvenile" = "J"))
+                          ),
+                          mainPanel(tableOutput("summary_table"))
+                        )
+               ),
                            
                            
                            tabPanel("Dive Success",
@@ -164,19 +153,34 @@ ui <- fluidPage(theme = "style.css",
                                     )
                            ),
                            
-                           tabPanel("Otter Characteristics",
-                                    titlePanel("Otter Characteristics"),
-                                    sidebarLayout(
-                                      sidebarPanel(checkboxGroupInput(inputId = "characteristics",
-                                                                      label = "Select sex AND age:",
-                                                                      choices = c("Male" = "M", 
-                                                                                  "Female" = "F",
-                                                                                  "Adult" = "A", 
-                                                                                  "Juvenile" = "J"))
-                                      ),
-                                      mainPanel(tableOutput("summary_table"))
-                                    )
-                           )
+               tabPanel("About",
+                        titlePanel("About"),
+                        tags$div(tags$br(),tags$br(),tags$h4("Code"),
+                                 "Code and input data used to generate this Shiny mapping tool are available as ",tags$a(href="https://knb.ecoinformatics.org/view                                                  /urn%3Auuid%3Abbf026b7-ca66-412e-9243-33532506c4e0", "sea otter foraging data."),
+                                 tags$br(),tags$br(),tags$h4("Sources"),
+                                 "Nicole LaRoche, Sydney King, and Heidi Pearson. 2020. Sea otter foraging data, visual observations from Prince of Wales, Alaska. Knowledge                                        Network for Biocomplexity.",
+                                 tags$br(),tags$br(),tags$h4("Authors"),
+                                 "Lory Salazar, Master's Candidate at The Bren School of Environmental Science & Management",tags$br(),
+                                 "Catherine Takata, Master's Candidate at The Bren School of Environmental Science & Management ",tags$br(),
+                                 tags$br(),tags$br(),tags$h4("Research Location"),
+                                 
+                                 leaflet() %>% 
+                                   addTiles() %>% 
+                                   addProviderTiles(providers$Esri.WorldStreetMap) %>% 
+                                   addMiniMap(width = 200,
+                                              height = 150,
+                                              centerFixed = FALSE) %>% 
+                                   setView(lng = -134.105784, 
+                                           lat = 56.336226, 
+                                           zoom = 4) %>% 
+                                   addMarkers(lng = -134.105784, 
+                                              lat = 56.336226, 
+                                              popup = "Prince of Wales, AK"),
+                        )
+               )
+               
+               
+                           
                            
                            
                            
