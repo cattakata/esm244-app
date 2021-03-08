@@ -118,7 +118,19 @@ ui <- fluidPage(theme = "style.css",
                                       sidebarPanel(
                                                    checkboxGroupInput(inputId = "pick_prey",
                                                                       label = "Choose species:",
-                                                                      choices = unique(prey_10$prey_item))
+                                                                      choices = c("CA sea cucumber" = "APC",
+                                                                                  "Cancer crab" = "CAN",
+                                                                                  "Clam, unidentified" = "CLA",
+                                                                                  "Nuttal's cockle" = "CLN",
+                                                                                  "Crab, unidentified" = "CRA",
+                                                                                  "Soft-shell clam" = "MYT",
+                                                                                  "Pandalus shrimp" = "PAS",
+                                                                                  "Littleneck clam" = "PRS",
+                                                                                  "Butter clam" = "SAG",
+                                                                                  "Marine snail, various" = "SNA",
+                                                                                  "Unknown" = "UNK"),
+                                                                      selected = c("APC", "CAN", "CLA", "CLN", "CRA", "MYT",
+                                                                                   "PAS", "PRS", "SAG", "SNA", "UNK"))
                                       ),
                                       mainPanel(plotOutput("prey_plot"))
                                     )
@@ -132,7 +144,8 @@ ui <- fluidPage(theme = "style.css",
                                                           choices = c("Male" = "M", 
                                                                       "Female" = "F",
                                                                       "Adult" = "A", 
-                                                                      "Juvenile" = "J"))
+                                                                      "Juvenile" = "J"),
+                                                          selected = c("M", "A"))
                           ),
                           mainPanel(htmlOutput("summary_table"))
                         )
