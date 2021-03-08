@@ -21,7 +21,13 @@ prey <- foraging %>%
   group_by(prey_item) %>% 
   count(suc, wt = prey_qty) %>% 
   rename(prey_caught = n) %>% 
-  filter(suc == "Y")
+  filter(suc == "Y") 
+
+prey_10 <- prey [-c(1),] %>% 
+  slice_max(prey_caught, n = 10) %>% 
+  ungroup %>%
+  top_n(10, prey_caught)
+
 
 age_sex <- foraging %>% 
   filter(sex == "F" | sex == "M") %>% 
@@ -137,7 +143,7 @@ ui <- fluidPage(theme = "style.css",
                                       sidebarPanel(
                                                    checkboxGroupInput(inputId = "pick_prey",
                                                                       label = "Choose species:",
-                                                                      choices = unique(prey$prey_item))
+                                                                      choices = unique(prey_10$prey_item))
                                       ),
                                       mainPanel(plotOutput("prey_plot"))
                                     )
@@ -183,7 +189,7 @@ server <- function(input, output, session) {
   
   prey_reactive <- reactive({
     
-    prey %>%
+    prey_10 %>%
       filter(prey_item %in% input$pick_prey)
   })
   
