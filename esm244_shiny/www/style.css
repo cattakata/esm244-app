@@ -75,3 +75,27 @@ h3 {
 	font-style: italic;
 	font-family: 'Montserrat', sans-serif;
 }
+
+
+/* Parallax Section */
+.banner {
+	background-color: #000000;
+	background-image: url('https://kuow-prod.imgix.net/store/a8d92d9bdb650c8244a6fe10ac928059.jpg?ixlib=rails-2.1.4&auto=format&crop=faces&fit=crop&h=634&w=924');
+	
+	height: 500px;
+	width: inherit;
+	background-attachment: fixed;
+	background-size: cover;
+	background-repeat: no-repeat;
+}
+.parallax {
+	color: #000000;
+	text-align: center;
+	/*/padding-right: 100px;/*/
+	padding-right: -100px;
+	padding-top: 110px;
+	letter-spacing: 2px;
+	margin-top: 0px;
+    font-size: 80px;
+}
+
