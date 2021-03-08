@@ -83,19 +83,29 @@ ui <- fluidPage(theme = "style.css",
                           tabPanel("Home",
                                   HTML(
                                     "<section class='banner'>
-                                    <h2 class='parallax'>SEA OTTER FORAGING</h2>
+                                   <h2 class='parallax'>SEA OTTER FORAGING</h2>
                                     </section>"),
                                   tags$div(
                                     tags$br(), tags$br(), tags$h4(),
-                                    "The sea otters of Prince Wales, Alaska, U.S., were relocated as a result of conservation efforts in 1968. Ecologist of the University of                                         Alaska and neighboring areas studied otters as a part of the Apex Predators, Ecosystems, and Community Sustainability (APECS) project                                       in order to study the impacts of the reintroduction on coastal communities. We will further manipulate data provided from APEC to create an                                             interactive interface to identify trends or significant effects."), 
-                                  # mainPanel(
-                                  #   img(src = "eating.png",
-                                  #       height = 250,
-                                  #       width = 300,
-                                  #       style = "display: block; margin-left: auto; margin-right: auto;")
-                                  # )
+                                    h2("Otters of Prince Wales, Alaska")),
+                                  tags$div(
+                                    tags$br(), tags$br(), tags$h4(),
+                                    "The sea otters of Prince Wales, Alaska, U.S., were relocated in 1968 as part of the Apex Predators, Ecosystems, and Community Sustainability (APECS) project. To understand the impacts of its reintroduction we will use interactive tools to identify trends or significant effects.",
+                                    
+                                    tags$div(
+                                      tags$br(), tags$br(), tags$h4(),
+                                      h2("Data Exploration")),
+                                    tags$div(
+                                      tags$br(), tags$br(), tags$h4(),
+                                      "We can explore the spatial extent of foraging dives sucess during food foraging, prey catch, and the relationship between otter characteristics and foraging patterns. The tools will react to user input to information through maps, tables, or plots.",
+                                    
+                                  img(src = "clip_otter.png",
+                                      height = 250,
+                                      width = 500,
+                                      style = "display: block; margin-left: auto; margin-right: auto;")
+                          )
+                                  )
                           ),
-               
                            
                            tabPanel("Dive Type",
                                     titlePanel("Dive Type"),
@@ -173,6 +183,8 @@ ui <- fluidPage(theme = "style.css",
                            
                tabPanel("About",
                         titlePanel("About"),
+                        tags$div(tags$br(),tags$br(),tags$h4("Background"),
+                                 "The sea otters of Prince Wales, Alaska, U.S., were relocated as a result of conservation efforts in 1968. Ecologist of the University of                                         Alaska and neighboring areas studied otters as a part of the Apex Predators, Ecosystems, and Community Sustainability (APECS) project                                       in order to study the impacts of the reintroduction on coastal communities. We will further manipulate data provided from APEC to create an                                             interactive interface to identify trends or significant effects."),
                         tags$div(tags$br(),tags$br(),tags$h4("Code"),
                                  "Code and input data used to generate this Shiny mapping tool are available as ",tags$a(href="https://knb.ecoinformatics.org/view                                                  /urn%3Auuid%3Abbf026b7-ca66-412e-9243-33532506c4e0", "sea otter foraging data."),
                                  tags$br(),tags$br(),tags$h4("Sources"),
@@ -181,6 +193,8 @@ ui <- fluidPage(theme = "style.css",
                                  "Lory Salazar, Master's Candidate at The Bren School of Environmental Science & Management",tags$br(),
                                  "Catherine Takata, Master's Candidate at The Bren School of Environmental Science & Management ",tags$br(),
                                  tags$br(),tags$br(),tags$h4("Research Location"),
+                                 
+                                 "Prince Wales, Alaska",tags$br(),
                                  
                                  leaflet() %>% 
                                    addTiles() %>% 
