@@ -76,7 +76,6 @@ age_plot <- ggplot(data = blr_fitted, aes(x = age, y = .fitted)) +
 blr_fitted <- success_blr %>% 
   broom::augment(type.predict = "response")
 
-_____________________________________
 
 ui <- fluidPage(theme = "style.css",
     navbarPage("Sea otter foraging",
