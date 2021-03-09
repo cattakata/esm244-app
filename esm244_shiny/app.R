@@ -94,13 +94,13 @@ ui <- fluidPage(theme = "style.css",
                                     
                                     tags$div(
                                       tags$br(), tags$br(), tags$h4(),
-                                      h2("Data Exploration")),
+                                      h2("Interactive Data Exploration")),
                                     tags$div(
                                       tags$br(), tags$br(), tags$h4(),
-                                      "We can explore the spatial extent of foraging dives sucess during food foraging, prey catch, and the relationship between otter characteristics and foraging patterns. The tools will react to user input to information through maps, tables, or plots.",
+                                      "We can explore the spatial extent of foraging dives sucess during food foraging, prey catch, and the relationship between otter characteristics and foraging patterns. The tools will react to user input to display information through maps, tables, or plots.",
                                     
                                   img(src = "clip_otter.png",
-                                      height = 250,
+                                      height = 275,
                                       width = 500,
                                       style = "display: block; margin-left: auto; margin-right: auto;")
                           )
