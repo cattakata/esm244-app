@@ -65,12 +65,16 @@ blr_fitted <- success_blr %>%
 sex_plot <- ggplot(data = blr_fitted, aes(x = sex, y = .fitted)) +
   geom_col() +
   labs(x = "Sex",
-       y = "Probability of outcome successful")
+       y = "Probability of outcome successful",
+       title = "Probability of successful dive based on otter sex in Prince of Wales, AK") +
+  theme_minimal()
 
 age_plot <- ggplot(data = blr_fitted, aes(x = age, y = .fitted)) +
   geom_col() +
   labs(x = "Age",
-       y = "Probability of outcome successful")
+       y = "Probability of outcome successful",
+       title = "Probability of successful dive based on otter age in Prince of Wales, AK") +
+  theme_minimal()
 
 
 ui <- fluidPage(theme = "style.css",
@@ -230,7 +234,10 @@ server <- function(input, output, session) {
   output$prey_plot <- renderPlot(
     ggplot(data = prey_reactive(), aes(x = prey_item,
                                        y = prey_caught)) +
-      geom_col()
+      geom_col() +
+      labs(x = "Prey type", y = "Quantity of prey caught",
+           title = "Top 10 prey caught by sea otters in Prince of Wales, AK") +
+      theme_minimal()
     
   )
   
