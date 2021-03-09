@@ -25,12 +25,13 @@ prey <- foraging %>%
   rename(prey_caught = n) %>% 
   filter(suc == "Y") 
 
+# Top 10 prey for "prey type" tab
 prey_10 <- prey [-c(1),] %>% 
   slice_max(prey_caught, n = 10) %>% 
   ungroup %>%
   top_n(10, prey_caught)
 
-
+# Establish a new data set for "otter characteristics" tab
 age_sex <- foraging %>% 
   filter(sex == "F" | sex == "M") %>% 
   filter(age == "J" | age == "A")
@@ -48,36 +49,35 @@ blr_subset <- age_sex %>%
            suc == "N") %>% 
   mutate(suc = fct_drop(suc))
 
+# Converting "suc" o factor
 blr_subset$suc <- as.factor(blr_subset$suc)
 
+# Running blr
 success_blr <- glm(suc ~ age + sex,
                    data = blr_subset,
                    family = "binomial")
 
-blr_tidy <- broom::tidy(success_blr)
+blr_tidy <- broom::tidy(success_blr) 
 
 blr_tidy$p.value <- round(blr_tidy$p.value, digit = 3)
-
-blr_tidy %>% 
-  mutate(p.value = case_when(p.value < 0.0001 ~ "< 0.0001",
-                             TRUE ~ as.character(p.value))) 
 
 blr_fitted <- success_blr %>% 
   broom::augment(type.predict = "response")
 
-
+# Plots to be called in blr tab
 sex_plot <- ggplot(data = blr_fitted, aes(x = sex, y = .fitted)) +
   geom_col() +
   labs(x = "Sex",
-       y = "Probability of outcome successful")
+       y = "Probability of outcome successful",
+       title = "Probability of successful dive based on otter sex in Prince of Wales, AK") +
+  theme_minimal()
 
 age_plot <- ggplot(data = blr_fitted, aes(x = age, y = .fitted)) +
   geom_col() +
   labs(x = "Age",
-       y = "Probability of outcome successful")
-
-blr_fitted <- success_blr %>% 
-  broom::augment(type.predict = "response")
+       y = "Probability of outcome successful",
+       title = "Probability of successful dive based on otter age in Prince of Wales, AK") +
+  theme_minimal()
 
 
 ui <- fluidPage(theme = "style.css",
@@ -188,7 +188,7 @@ ui <- fluidPage(theme = "style.css",
                            ),
                
                tabPanel("Otter Characteristics",
-                        titlePanel("Otter Characteristics"),
+                        titlePanel("Otter Foraging characteristics"),
                         sidebarLayout(
                           sidebarPanel(checkboxGroupInput(inputId = "characteristics",
                                                           label = "Select sex AND age:",
@@ -210,7 +210,7 @@ ui <- fluidPage(theme = "style.css",
                                       sidebarPanel(selectInput("select", label = ("Select predictor variable:"), 
                                                                inputId = "pick_regress",
                                                                choices = c("Age" = "age", "Sex" = "sex")),
-                                                   tableOutput("regression_table")
+                                                   htmlOutput("regression_table")
                                                    ),
                                       mainPanel(plotOutput("regression_plot"))
                                       
@@ -272,7 +272,10 @@ server <- function(input, output, session) {
   output$prey_plot <- renderPlot(
     ggplot(data = prey_reactive(), aes(x = prey_item,
                                        y = prey_caught)) +
-      geom_col()
+      geom_col() +
+      labs(x = "Prey type", y = "Quantity of prey caught",
+           title = "Top 10 prey caught by sea otters in Prince of Wales, AK") +
+      theme_minimal()
     
   )
   
@@ -345,8 +348,12 @@ server <- function(input, output, session) {
       if (input$pick_regress == "sex")  {print(sex_plot)}  
   })
   
-  output$regression_table <- renderTable(
-    blr_tidy
+  output$regression_table <- renderText(
+    blr_tidy %>%
+      mutate(p.value = case_when(p.value < 0.0001 ~ "< 0.0001",
+                                 TRUE ~ as.character(p.value))) %>%
+      kable("html", col.names = c("Term", "Estimate", "Standard Error", "Statistic", "P-value")) %>%
+      kable_styling("striped")
   )
     
   
