@@ -41,25 +41,6 @@ dive_data <- foraging %>%
 
 pal <- colorFactor(c("orange", "purple", "red", "blue", "black", "green"), domain = c("Y", "N", "T", "C", "I", "U"))
 
-# getColor <- function(dive_data) {
-#   sapply(dive_data$suc, function(suc) {
-#     if(suc == "Y") {
-#       "green"
-#     } else if(suc == "N") {
-#       "red"
-#     } else {
-#       "blue"
-#     } } )
-# }
-# 
-# icons <- awesomeIcons(
-#   icon = 'ios-close',
-#   iconColor = 'black',
-#   library = 'ion',
-#   markerColor = getColor(dive_data)
-# )
-
-
 
 # Establish new subsets for blr regression analysis of sex and age 
 blr_subset <- age_sex %>% 
@@ -107,24 +88,57 @@ ui <- fluidPage(theme = "style.css",
                                     "<section class='banner'>
                                    <h2 class='parallax'>SEA OTTER FORAGING</h2>
                                     </section>"),
+                                  br(),
+                                  br(),
+                                  br(),
+                                  br(),
+                                  br(),
+                                  br(),
+                                  br(),
+                                  br(),
+                                  br(),
                                   tags$div(
                                     tags$br(), tags$br(), tags$h4(),
                                     h2("Otters of Prince Wales, Alaska")),
+                                  br(),
                                   tags$div(
-                                    tags$br(), tags$br(), tags$h4(),
-                                    "The sea otters of Prince Wales, Alaska, U.S., were relocated in 1968 as part of the Apex Predators, Ecosystems, and Community Sustainability (APECS) project. To understand the impacts of its reintroduction we will use interactive tools to identify trends or significant effects.",
-                                    
+                                  h4("The sea otters of Prince Wales, Alaska, U.S., were relocated in 1968 as part of the Apex Predators, Ecosystems, and Community Sustainability (APECS) project. To understand the impacts of its reintroduction we will use interactive tools to identify trends or significant effects."),
+                                  
+                                    br(),
+                                    br(),
+                                  
                                     tags$div(
                                       tags$br(), tags$br(), tags$h4(),
-                                      h2("Interactive Data Exploration")),
+                                      h2("Explore Interactive Data")),
                                     tags$div(
-                                      tags$br(), tags$br(), tags$h4(),
-                                      "We can explore the spatial extent of foraging dives sucess during food foraging, prey catch, and the relationship between otter characteristics and foraging patterns. The tools will react to user input to display information through maps, tables, or plots.",
-                                    
-                                  img(src = "clip_otter.png",
-                                      height = 275,
-                                      width = 500,
-                                      style = "display: block; margin-left: auto; margin-right: auto;")
+                                      
+                                      br(),
+                                      br(),
+                                      
+                                  img(src = "otter_diving.png",
+                                      height = 200,
+                                      width = 200,
+                                      style = "display: block; margin-left:auto; margin-right: auto;",
+                                      column(width = 12, h3("Map Dive Success"))), 
+                                  
+                                  br(),
+                                  br(),
+                                  
+                                  img(src = "crab.png",
+                                      height = 200,
+                                      width = 200,
+                                      style = "display: block; margin-left:auto; margin-right: auto;",
+                                      column(width = 12, h3("Quantify Prey Type"))),
+                                  
+                                  br(),
+                                  br(),
+                                  
+                                  img(src = "otter_black.png",
+                                      height = 200,
+                                      width = 200,
+                                      style = "display: block; margin-left:auto; margin-right: auto;",
+                                      column(width = 12, h3("Summarize Otter Characteristics"))),
+                                  
                           )
                                   )
                           ),
@@ -217,7 +231,9 @@ ui <- fluidPage(theme = "style.css",
                                  tags$br(),tags$br(),tags$h4("Research Location"),
                                  
                                  "Prince Wales, Alaska",tags$br(),
-                                 
+                                 br(),
+                                 br(),
+
                                  leaflet() %>% 
                                    addTiles() %>% 
                                    addProviderTiles(providers$Esri.WorldStreetMap) %>% 
@@ -230,13 +246,13 @@ ui <- fluidPage(theme = "style.css",
                                    addMarkers(lng = -134.105784, 
                                               lat = 56.336226, 
                                               popup = "Prince of Wales, AK"),
+                                 br(),
+                                 br(),
+                                 br(),
+                                 br(),
                         )
                )
-               
-               
-                           
-                           
-                           
+                      
                            
                 )
                 
