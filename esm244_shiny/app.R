@@ -40,6 +40,28 @@ age_sex <- foraging %>%
 dive_data <- foraging %>% 
   select(otter_lat_deg, otter_long_deg, suc)
 
+pal <- colorFactor(c("orange", "purple", "red", "blue", "black", "green"), domain = c("Y", "N", "T", "C", "I", "U"))
+
+# getColor <- function(dive_data) {
+#   sapply(dive_data$suc, function(suc) {
+#     if(suc == "Y") {
+#       "green"
+#     } else if(suc == "N") {
+#       "red"
+#     } else {
+#       "blue"
+#     } } )
+# }
+# 
+# icons <- awesomeIcons(
+#   icon = 'ios-close',
+#   iconColor = 'black',
+#   library = 'ion',
+#   markerColor = getColor(dive_data)
+# )
+
+
+
 # Establish new subsets for blr regression analysis of sex and age 
 blr_subset <- age_sex %>% 
   filter(suc == "Y" |
@@ -113,12 +135,12 @@ ui <- fluidPage(theme = "style.css",
                                         sidebarPanel(selectInput("select_dive", 
                                                                  label = "Select dive type:",
                                                                  choices = list("All dives", 
-                                                                                "Successful Dives" = "Y", 
-                                                                                "Unsuccessful dives" = "N", 
-                                                                                "Travel dive" = "T", 
-                                                                                "Previous dive" = "C", 
-                                                                                "Interactive otter dive" = "I", 
-                                                                                "Unknown" = "U"
+                                                                                "Successful dive (Y)" = "Y", 
+                                                                                "Unsuccessful dive (N)" = "N", 
+                                                                                "Travel dive (T)" = "T", 
+                                                                                "Previous dive (C)" = "C", 
+                                                                                "Interactive otter dive (I)" = "I", 
+                                                                                "Unknown (U)" = "U"
                                                                  ),
                                                      )
                                        
@@ -267,19 +289,34 @@ server <- function(input, output, session) {
   output$map <- renderLeaflet({
     leaflet(dive_react()) %>%
       addProviderTiles(providers$Esri.WorldTopoMap) %>%
-      addMarkers(~otter_long_deg, ~otter_lat_deg, 
-                 label = ~suc, 
-                 labelOptions = labelOptions(textsize = "12px"),
-                 popup = ~suc)
+      addCircleMarkers(~otter_long_deg, 
+                       ~otter_lat_deg, 
+                       label = ~suc, 
+                       labelOptions = labelOptions(textsize = "12px"),
+                       popup = ~suc,
+                       color = ~pal(suc),
+                       fillOpacity = 0.5,
+                       stroke = F,
+                       radius = 5) %>% 
+      addLegend(pal = pal, 
+                values = ~suc, 
+                opacity = 0.7, 
+                title = "Dive Type",
+                position = "bottomright")
   })
   
   observe({
     leafletProxy("map", data = dive_react()) %>%
       clearShapes() %>%
-      addMarkers(~otter_long_deg, ~otter_lat_deg, 
+      addCircleMarkers(~otter_long_deg,
+                       ~otter_lat_deg, 
                  label = ~suc, 
                  labelOptions = labelOptions(textsize = "12px"),
-                 popup = ~suc)
+                 popup = ~suc,
+                 color = ~pal(suc),
+                 fillOpacity = 0.5,
+                 stroke = F,
+                 radius = 5)
   })
 
   blr_reactive <- reactive({

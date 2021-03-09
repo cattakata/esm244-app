@@ -17,10 +17,26 @@ library(tmap)
 library(leaflet)
 ```
 
-```{r summary stats, echo = F}
-dive_data <- read.csv(here("data","2018_foraging.csv")) %>% 
+```{r}
+foraging <- read.csv(here("data","2018_foraging.csv")) %>% 
   clean_names() %>% 
-  select(otter_lat_deg, otter_long_deg, suc)
+  mutate(date = mdy(date)) %>% 
+  rename(aerial_survey_yr = year)
+```
+
+
+```{r summary stats, echo = F}
+dive_data <- foraging %>% 
+  select(otter_lat_deg, otter_long_deg, suc) %>% 
+  drop_na() %>% 
+  mutate(suc = case_when(
+    suc %in% "Y" ~ "Successful dive",
+    suc %in% "N" ~ "Unsuccessful dive",
+    suc %in% "T" ~ "Travel dive",
+    suc %in% "C" ~ "Previous dive",
+    suc %in% "I" ~ "Interactive otter dive",
+    suc %in% "U" ~ "Unknown"
+    ))
 ```
 
 ```{r}
