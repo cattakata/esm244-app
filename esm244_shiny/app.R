@@ -12,13 +12,13 @@ library(kableExtra)
 library(broom)
 
 # Read in data set 
-foraging <- read.csv(here("esm244_shiny","data","2018_foraging.csv")) %>% 
+foraging <- read.csv(here("data","2018_foraging.csv")) %>% 
   clean_names() %>% 
   mutate(date = mdy(date)) %>% 
   rename(aerial_survey_yr = year)
 
 # Read in the prey class data
-prey_class <- read.csv(here("esm244_shiny","data", "top_10_prey.csv")) %>% 
+prey_class <- read.csv(here("data", "top_10_prey.csv")) %>% 
   select(1, 3:5) %>% 
   clean_names()
 

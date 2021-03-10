@@ -5,6 +5,6 @@ account: lorysalazar
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 3766013
-bundleId: 4324269
+bundleId: 4324311
 url: https://lorysalazar.shinyapps.io/esm244_shiny/
-when: 1615352086.49274
+when: 1615353083.31379
