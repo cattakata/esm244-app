@@ -11,14 +11,15 @@ library(shinyWidgets)
 library(kableExtra)
 library(broom)
 
+
 # Read in data set 
-foraging <- read.csv(here("data","2018_foraging.csv")) %>% 
+foraging <- read.csv("2018_Foraging.csv") %>% 
   clean_names() %>% 
   mutate(date = mdy(date)) %>% 
   rename(aerial_survey_yr = year)
 
 # Read in the prey class data
-prey_class <- read.csv(here("data", "top_10_prey.csv")) %>% 
+prey_class <- read.csv("top_10_prey.csv") %>% 
   select(1, 3:5) %>% 
   clean_names()
 
@@ -280,7 +281,7 @@ server <- function(input, output, session) {
                                        y = prey_caught)) +
       geom_col() +
       labs(x = "Prey type", y = "Quantity of prey caught",
-           title = "Top 10 prey caught by sea otters in Prince of Wales, AK") +
+           title = "Top prey caught by sea otters in Prince of Wales, AK") +
       theme_minimal() 
     
   )

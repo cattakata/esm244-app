@@ -1,0 +1,12 @@
+name: otters_shiny
+title: otters_shiny
+username:
+account: lorysalazar
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3766427
+bundleId: 4324812
+url: https://lorysalazar.shinyapps.io/otters_shiny/
+when: 1615359446.95509
+asMultiple: FALSE
+asStatic: FALSE
