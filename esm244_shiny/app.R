@@ -17,6 +17,11 @@ foraging <- read.csv(here("data","2018_foraging.csv")) %>%
   mutate(date = mdy(date)) %>% 
   rename(aerial_survey_yr = year)
 
+# Read in the prey class data
+prey_class <- read.csv(here("data", "top_10_prey.csv")) %>% 
+  select(1, 3:5) %>% 
+  clean_names()
+
 # Establish new data set to call for "prey type" tab 
 prey <- foraging %>% 
   select(suc, prey_item, date, age, prey_qty) %>% 
@@ -183,7 +188,8 @@ ui <- fluidPage(theme = "style.css",
                                                                       selected = c("APC", "CAN", "CLA", "CLN", "CRA", "MYT",
                                                                                    "PAS", "PRS", "SAG", "SNA", "UNK"))
                                       ),
-                                      mainPanel(plotOutput("prey_plot"))
+                                      mainPanel(plotOutput("prey_plot"),
+                                                htmlOutput("prey_legend"))
                                     )
                            ),
                
@@ -270,13 +276,19 @@ server <- function(input, output, session) {
   })
   
   output$prey_plot <- renderPlot(
-    ggplot(data = prey_reactive(), aes(x = prey_item,
+    ggplot(data = prey_reactive(), aes(x = reorder(prey_item, -prey_caught),
                                        y = prey_caught)) +
       geom_col() +
       labs(x = "Prey type", y = "Quantity of prey caught",
            title = "Top 10 prey caught by sea otters in Prince of Wales, AK") +
-      theme_minimal()
+      theme_minimal() 
     
+  )
+  
+  output$prey_legend <- renderText(
+    prey_class %>%
+      kable("html", col.names = c("Prey code", "Common name", "Species name", "Class name")) %>%
+      kable_styling("striped")
   )
   
   char_reactive <- reactive ({
